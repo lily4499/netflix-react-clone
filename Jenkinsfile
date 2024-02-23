@@ -3,6 +3,16 @@ pipeline {
     options {
         timeout(time: 20, unit: 'MINUTES')
     }
+
+    environment {
+        DOCKER_CREDENTIALS = 'lily-docker-credentials'
+        DOCKER_IMAGE_NAME = 'netflix-clone'
+        DOCKER_IMAGE_TAG = 'latest'
+        DOCKER_USERNAME = 'laly9999'
+
+    }
+
+
     stages{
         // NPM dependencies
         stage('pull npm dependencies') {
@@ -14,27 +24,21 @@ pipeline {
             steps {
                 script {
                     // build image
-                    docker.build("433342081437.dkr.ecr.us-east-1.amazonaws.com/netflix-oct:latest")
+                    docker.build("$DOCKER_USERNAME/$DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG")
                }
             }
         }
         stage('Trivy Scan (Aqua)') {
             steps {
-                sh 'trivy image --format template --output trivy_report.html 433342081437.dkr.ecr.us-east-1.amazonaws.com/netflix-oct:latest'
+                sh 'trivy image --format template --output trivy_report.html $DOCKER_USERNAME/$DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG'
             }
        }
-        stage('Push to ECR') {
+        stage('Push to DockerHub') {
             steps {
                 script{
-                    //https://<AwsAccountNumber>.dkr.ecr.<region>.amazonaws.com/netflix-app', 'ecr:<region>:<credentialsId>
-                    //docker.withRegistry('https://433342081437.dkr.ecr.us-east-1.amazonaws.com/netflix-oct', 'ecr.us-east-1:lil-ecr') {
-                    withDockerRegistry(credentialsId: 'ecr:us-east-1:lil-ecr', url: 'https://433342081437.dkr.ecr.us-east-1.amazonaws.com') {
-                    // build image
-                    def myImage = docker.build("433342081437.dkr.ecr.us-east-1.amazonaws.com/netflix-oct:latest")
-                    // push image
-                    myImage.push()
-                    }
-                }
+                    withDockerRegistry(credentialsId: '$DOCKER_CREDENTIALS', toolName: 'docker') {
+                        sh "docker push $DOCKER_USERNAME/$DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG"
+                }   }
             }
         }
         
