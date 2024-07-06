@@ -4,7 +4,7 @@ pipeline {
     environment {
         AWS_REGION = 'us-east-1'
         ECR_REPOSITORY = 'ecr-jenkins'
-        IMAGE_TAG = 'latest'
+        IMAGE_TAG = 'v2'
         AWS_ACCOUNT_ID = '637423529262'
         CREDENTIALS_ID = 'aws-ecr-jenkins-credentials-id' // The ID of the AWS credentials stored in Jenkins
         AWS_PROFILE = 'ecr-jenkins-user' // The AWS profile name
@@ -25,6 +25,12 @@ pipeline {
                 }
             }
         }
+
+         stage('Trivy Scan (Aqua)') {
+            steps {
+                sh 'trivy image --format template --output trivy_report.html ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}:${IMAGE_TAG}'
+            }
+       }
         
         stage('Login to AWS ECR') {
             steps {
