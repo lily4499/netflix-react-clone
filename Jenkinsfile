@@ -6,7 +6,7 @@ pipeline {
         ECR_REPOSITORY = 'ecr-jenkins'
         IMAGE_TAG = 'latest'
         AWS_ACCOUNT_ID = '637423529262'
-        CREDENTIALS_ID = 'aws-credentials-id' // The ID of the AWS credentials stored in Jenkins
+        CREDENTIALS_ID = 'aws-ecr-jenkins-credentials-id' // The ID of the AWS credentials stored in Jenkins
         AWS_PROFILE = 'ecr-jenkins-user' // The AWS profile name
     }
 
