@@ -26,13 +26,28 @@ pipeline {
             }
         }
 
-         stage('Trivy Scan (Aqua)') {
-            steps {
+       //  stage('Trivy Scan (Aqua)') {
+        //    steps {
              //   sh 'trivy image --format template --output trivy_report.html ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}:${IMAGE_TAG}'
-                sh 'trivy image --format json --output trivy_report.json ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}:${IMAGE_TAG}'
+           //     sh 'trivy image --format json --output trivy_report.json ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}:${IMAGE_TAG}'
 
+         //   }
+      // }
+
+         stage('Update Trivy DB') {
+            steps {
+                sh 'trivy image --download-db-only'
             }
-       }
+        }
+
+        stage('Run Trivy Scan') {
+            steps {
+                sh '''
+                    echo '{{- range . }}\n{{ .Target }}\n{{ range .Vulnerabilities }}\n{{ .VulnerabilityID }} {{ .PkgName }} {{ .InstalledVersion }} {{ .FixedVersion }} {{ .Severity }} {{ .Title }}\n{{ end }}\n{{ end }}' > trivy-template.tpl
+                    trivy image --template trivy-template.tpl --output trivy_report.html ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}:${IMAGE_TAG}
+                '''
+            }
+        }
         
         stage('Login to AWS ECR') {
             steps {
