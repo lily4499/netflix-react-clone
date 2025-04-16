@@ -23,12 +23,6 @@ variable "task_family" {
   default     = "my-task-family-test"
 }
 
-variable "image_tag" {
-  description = "Version tag to use for the Docker image"
-  type        = string
-}
-
-
 variable "node_image" {
   description = "The Docker image for container 1."
   default     = "laly9999/netflix-app:latest"
