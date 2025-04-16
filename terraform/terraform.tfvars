@@ -1,0 +1,9 @@
+aws_region              = "us-east-1"
+public_subnet_ids       = ["subnet-062bafb72ff1b9c71", "subnet-00f1308ab05d4d97a"]  # Updated to list format
+vpc_id                  = "vpc-03701e181332d26eb"       # <-- Replace with your actual VPC ID
+ecs_cluster_name        = "lili-ecs-cluster"
+task_family             = "my-task-family-test"
+node_image              = "laly9999/netflix-app:latest"
+service_name            = "my-service"
+ecs_task_execution_role_name = "ecs_task_execution_role"
+node_container_port     = 80
